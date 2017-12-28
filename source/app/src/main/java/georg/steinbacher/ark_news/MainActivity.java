@@ -10,18 +10,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.volley.Cache;
-import com.android.volley.Network;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
@@ -33,71 +26,28 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import georg.steinbacher.ark_news.ark.Transaction;
+import georg.steinbacher.ark_news.requests.RequestQueueSingleton;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String GET_TRANSACTIONS_URL = "https://api.arkcoin.net/api/transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=0";
+    private static final String GET_TRANSACTIONS_URL = "https://api.arkcoin.net/api/transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=";
 
     private Context mContext;
     private ArrayList<Transaction> mTransactionsList = new ArrayList<>();
-
-    private JsonObjectRequest mGetTransactionsRequest = new JsonObjectRequest
-            (Request.Method.GET, GET_TRANSACTIONS_URL, null, new Response.Listener<JSONObject>() {
-
-        @Override
-        public void onResponse(JSONObject response) {
-            ListView listView = (ListView) findViewById(R.id.main_listview);
-
-
-            try {
-                JSONArray transactions = response.getJSONArray("transactions");
-
-                for(int i=0; i<transactions.length(); i++) {
-                    if(transactions.getJSONObject(i).has("vendorField"))
-                        mTransactionsList.add(new Transaction(transactions.getJSONObject(i)));
-                }
-
-                //sort
-                Collections.sort(mTransactionsList, new Comparator<Transaction>() {
-                    public int compare(Transaction t1, Transaction t2){
-                        if(t1.getId().equals(t2.getId())) {
-                            return 0;
-                        } else if (t1.getTimestamp() > t2.getTimestamp()) {
-                            return 1;
-                        } else {
-                            return -1;
-                        }
-                    }
-                });
-
-                TransactionsAdapter adapter = new TransactionsAdapter(mContext, R.layout.main_listview_row, mTransactionsList);
-                listView.setAdapter(adapter);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }, new Response.ErrorListener() {
-
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            // TODO Auto-generated method stub
-
-        }
-    });
-
+    private int mTransactionsCount = 0;
+    private int mCurrentOffset = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mContext = this;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        RequestQueueSingleton.getInstance(this).addToRequestQueue(mGetTransactionsRequest);
+        pullTransactions();
     }
 
     @Override
@@ -129,6 +79,67 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addTransactions(JSONArray response) throws JSONException{
+        for(int i=0; i<response.length(); i++) {
+            if(response.getJSONObject(i).has("vendorField"))
+                mTransactionsList.add(new Transaction(response.getJSONObject(i)));
+        }
+    }
+
+    private void pullTransactions() {
+        JsonObjectRequest getTransactionsRequest = new JsonObjectRequest
+                (Request.Method.GET, GET_TRANSACTIONS_URL + mCurrentOffset, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray transactions = response.getJSONArray("transactions");
+                            addTransactions(transactions);
+
+                            mTransactionsCount = response.getInt("count");
+                            mCurrentOffset+=50;
+
+                            if(mTransactionsCount > mCurrentOffset) {
+                                pullTransactions();
+                            } else {
+                                //show the results
+                                ListView listView = (ListView) findViewById(R.id.main_listview);
+
+                                sortByTimestamp(mTransactionsList);
+                                TransactionsAdapter adapter = new TransactionsAdapter(mContext, R.layout.main_listview_row, mTransactionsList);
+                                listView.setAdapter(adapter);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i(TAG, "onErrorResponse: " + error.toString());
+                    }
+                });
+
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(getTransactionsRequest);
+    }
+
+    private void sortByTimestamp(ArrayList<Transaction> transactions) {
+        //sort
+        Collections.sort(transactions, new Comparator<Transaction>() {
+            public int compare(Transaction t1, Transaction t2){
+                if(t1.getId().equals(t2.getId())) {
+                    return 0;
+                } else if (t1.getTimestamp() < t2.getTimestamp()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
     }
 
 }

@@ -3,12 +3,23 @@
     android:id="@+id/main_listview_row"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/row_vendorField"
+        android:text="Test news line 123"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        />
+
+    <TextView
+        android:id="@+id/row_date"
+        android:text="12.5.2017"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         />
 
 </android.support.v7.widget.LinearLayoutCompat>

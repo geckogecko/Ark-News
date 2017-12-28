@@ -3,11 +3,14 @@ package georg.steinbacher.ark_news;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.TextViewCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +44,13 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction>{
             view = vi.inflate(R.layout.main_listview_row, null);
         }
 
+        Transaction currentItem = mItems.get(position);
+
         TextView vendorField = view.findViewById(R.id.row_vendorField);
-        vendorField.setText(mItems.get(position).getVendorField());
+        TextView dateField = view.findViewById(R.id.row_date);
+
+        vendorField.setText(currentItem.getVendorField());
+        dateField.setText(Integer.toString(currentItem.getTimestamp()));
 
         return view;
     }

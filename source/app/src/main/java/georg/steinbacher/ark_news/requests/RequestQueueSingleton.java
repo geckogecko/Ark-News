@@ -1,4 +1,4 @@
-package georg.steinbacher.ark_news;
+package georg.steinbacher.ark_news.requests;
 
 import android.content.Context;
 
