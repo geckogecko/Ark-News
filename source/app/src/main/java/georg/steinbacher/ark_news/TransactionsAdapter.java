@@ -2,19 +2,16 @@ package georg.steinbacher.ark_news;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.TextViewCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import georg.steinbacher.ark_news.ark.Transaction;
 
@@ -50,8 +47,15 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction>{
         TextView dateField = view.findViewById(R.id.row_date);
 
         vendorField.setText(currentItem.getVendorField());
-        dateField.setText(Integer.toString(currentItem.getTimestamp()));
+        dateField.setText(getDateString(currentItem.getTimestamp()));
 
         return view;
+    }
+
+    private static final long FIRST_BLOCK_TIMESTAMP = 1458586800;
+    private String getDateString(long seconds) {
+        Date d = new Date((seconds * 1000 + FIRST_BLOCK_TIMESTAMP * 1000));
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy hh:mm");
+        return df.format(d);
     }
 }

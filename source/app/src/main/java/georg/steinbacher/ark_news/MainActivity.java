@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,12 +29,13 @@ import java.util.Comparator;
 import georg.steinbacher.ark_news.ark.Transaction;
 import georg.steinbacher.ark_news.requests.RequestQueueSingleton;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "MainActivity";
 
     private static final String GET_TRANSACTIONS_URL = "https://api.arkcoin.net/api/transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=";
 
     private Context mContext;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ArrayList<Transaction> mTransactionsList = new ArrayList<>();
     private int mTransactionsCount = 0;
     private int mCurrentOffset = 0;
@@ -45,18 +47,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mSwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         mContext = this;
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //start pulling all transactions
+        mSwipeRefreshLayout.setRefreshing(true);
+        this.onRefresh();
 
-        pullTransactions();
     }
 
     @Override
@@ -79,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        pullTransactions();
     }
 
     private void addTransactions(JSONArray response) throws JSONException{
@@ -110,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                                 sortByTimestamp(mTransactionsList);
                                 TransactionsAdapter adapter = new TransactionsAdapter(mContext, R.layout.main_listview_row, mTransactionsList);
                                 listView.setAdapter(adapter);
+
+                                mSwipeRefreshLayout.setRefreshing(false);
                             }
 
                         } catch (JSONException e) {
@@ -141,5 +147,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }

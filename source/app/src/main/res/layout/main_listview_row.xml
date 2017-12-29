@@ -9,9 +9,13 @@
     <TextView
         android:id="@+id/row_vendorField"
         android:text="Test news line 123"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginTop="5sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
         />
 
     <TextView
@@ -19,7 +23,11 @@
         android:text="12.5.2017"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:textColor="@color/colorTextSecondary"
         />
 
 </android.support.v7.widget.LinearLayoutCompat>
