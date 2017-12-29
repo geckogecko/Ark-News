@@ -2,6 +2,7 @@ package georg.steinbacher.ark_news;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,13 +50,18 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction>{
         vendorField.setText(currentItem.getVendorField());
         dateField.setText(getDateString(currentItem.getTimestamp()));
 
+        if((currentItem.getAmount()) >= 100000000)
+            vendorField.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+        else
+            vendorField.setTextColor(mContext.getResources().getColor(R.color.colorText));
+
         return view;
     }
 
     private static final long FIRST_BLOCK_TIMESTAMP = 1458586800;
     private String getDateString(long seconds) {
         Date d = new Date((seconds * 1000 + FIRST_BLOCK_TIMESTAMP * 1000));
-        DateFormat df = new SimpleDateFormat("dd MMM yyyy hh:mm");
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
         return df.format(d);
     }
 }
