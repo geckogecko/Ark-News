@@ -3,6 +3,7 @@ package georg.steinbacher.ark_news;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -16,6 +17,8 @@ import android.view.View;
 
 public class PreferencesActivity extends AppCompatActivity {
         private static final String TAG = "PreferencesActivity";
+
+        public static final String PEER_ADDRESS_KEY = "settings_peer_address";
 
         private static Context mContext;
 
@@ -35,6 +38,12 @@ public class PreferencesActivity extends AppCompatActivity {
             public void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 addPreferencesFromResource(R.xml.preferences);
+
+                EditTextPreference costomPeer = (EditTextPreference) findPreference(PEER_ADDRESS_KEY);
+                costomPeer.setText(MainActivity.DEFAULT_PEER);
+
+                String currentPeer = getPreferenceManager().getSharedPreferences().getString(PEER_ADDRESS_KEY, MainActivity.DEFAULT_PEER);
+                costomPeer.setSummary(currentPeer);
 
             }
 

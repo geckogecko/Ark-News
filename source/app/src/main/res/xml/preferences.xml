@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="123">
-        <SwitchPreference
-            android:key="pref_enable_notifications"
-            android:title="123"
-            android:summary="123"
-            android:defaultValue="true" />
+    <PreferenceCategory android:title="@string/settings_peer_address">
+        <EditTextPreference
+            android:key="settings_peer_address"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/settings_custom_peer" />
     </PreferenceCategory>
 </PreferenceScreen>

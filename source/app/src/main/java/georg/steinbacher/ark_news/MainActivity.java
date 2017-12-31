@@ -2,7 +2,9 @@ package georg.steinbacher.ark_news;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -33,7 +36,8 @@ import georg.steinbacher.ark_news.requests.RequestQueueSingleton;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "MainActivity";
 
-    private static final String GET_TRANSACTIONS_URL = "https://api.arkcoin.net/api/transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=";
+    public static final String DEFAULT_PEER = "https://api.arkcoin.net/api/";
+    private static final String GET_TRANSACTIONS_URL = "transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=";
 
     private Context mContext;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void pullTransactions() {
         JsonObjectRequest getTransactionsRequest = new JsonObjectRequest
-                (Request.Method.GET, GET_TRANSACTIONS_URL + mCurrentOffset, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, getPeerURLFromPref() + GET_TRANSACTIONS_URL + mCurrentOffset, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -130,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.i(TAG, "onErrorResponse: " + error.toString());
+                        Toast.makeText(mContext, getString(R.string.error_cannot_reach_peer), Toast.LENGTH_LONG).show();
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
 
@@ -149,5 +155,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
             }
         });
+    }
+
+    private String getPeerURLFromPref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPref.getString(PreferencesActivity.PEER_ADDRESS_KEY, DEFAULT_PEER);
     }
 }
