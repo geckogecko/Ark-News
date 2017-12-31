@@ -9,6 +9,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -20,16 +21,12 @@ public class PreferencesActivity extends AppCompatActivity {
 
         public static final String PEER_ADDRESS_KEY = "settings_peer_address";
 
-        private static Context mContext;
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_preferences);
 
             getFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsPreferenceFragment()).commit();
-
-            mContext = getApplicationContext();
         }
 
         public static class SettingsPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener
@@ -40,10 +37,17 @@ public class PreferencesActivity extends AppCompatActivity {
                 addPreferencesFromResource(R.xml.preferences);
 
                 EditTextPreference costomPeer = (EditTextPreference) findPreference(PEER_ADDRESS_KEY);
-                costomPeer.setText(MainActivity.DEFAULT_PEER);
-
                 String currentPeer = getPreferenceManager().getSharedPreferences().getString(PEER_ADDRESS_KEY, MainActivity.DEFAULT_PEER);
+                costomPeer.setText(currentPeer);
                 costomPeer.setSummary(currentPeer);
+                costomPeer.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        EditTextPreference costomPeer = (EditTextPreference) findPreference(PEER_ADDRESS_KEY);
+                        costomPeer.setSummary(newValue.toString());
+                        return true;
+                    }
+                });
 
             }
 
@@ -54,7 +58,14 @@ public class PreferencesActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onPause() {
+                super.onPause();
+                getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+            }
+
+            @Override
             public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+                Log.i(TAG, "onPreferenceTreeClick: ");
                 getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
