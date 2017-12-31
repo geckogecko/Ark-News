@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ark-News</string>
+    <string name="app_name">Ark News</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -9,5 +9,5 @@
     <!-- Strings related to Settings -->
     <string name="settings_peer_address">Peer Settings</string>
     <string name="settings_custom_peer">Custom Peer</string>
-    
+
 </resources>
