@@ -11,6 +11,7 @@
         <item name="android:textColorPrimaryInverse">@color/colorText</item>
         <item name="android:textColorSecondaryInverse">@color/colorText</item>
         <item name="android:textColorPrimary">@color/colorText</item>
+        <item name="android:textColorLink">@color/colorTextSecondary</item>
 
         <item name="android:alertDialogTheme">@style/Theme.DarkDialog</item>
     </style>
