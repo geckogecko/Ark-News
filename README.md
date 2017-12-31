@@ -4,7 +4,7 @@ Decentralized news about the Ark ecosystem - powered by the Ark blockchain.
 
 [Google Play store - Ark News](https://play.google.com/store/apps/details?id=georg.steinbacher.ark_news)
 
-<img src="https://raw.githubusercontent.com/geckogecko/Ark-News/master/development/device-2017-12-31-135716.png" alt="Screenshot1" height="350"/><img src="https://raw.githubusercontent.com/geckogecko/Ark-News/master/development/device-2017-12-31-135736.png" alt="Screenshot1" height="350"/>
+<img src="https://raw.githubusercontent.com/geckogecko/Ark-News/master/development/device-2017-12-31-135716.png" alt="Screenshot1" height="350"/> <img src="https://raw.githubusercontent.com/geckogecko/Ark-News/master/development/device-2017-12-31-135736.png" alt="Screenshot2" height="350"/> <img src="https://raw.githubusercontent.com/geckogecko/Ark-News/master/development/device-2017-12-31-135759.png" alt="Screenshot3" height="350"/>
 
 # HOWTO post News
 
