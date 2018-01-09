@@ -71,7 +71,7 @@ public class TransactionsAdapter extends ArrayAdapter<Transaction>{
         return view;
     }
 
-    private static final long FIRST_BLOCK_TIMESTAMP = 1458586800;
+    private static final long FIRST_BLOCK_TIMESTAMP = 1490122800;
     private String getDateString(long seconds) {
         Date d = new Date((seconds * 1000 + FIRST_BLOCK_TIMESTAMP * 1000));
         DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
