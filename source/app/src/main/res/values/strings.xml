@@ -9,5 +9,6 @@
     <!-- Strings related to Settings -->
     <string name="settings_peer_address">Peer Settings</string>
     <string name="settings_custom_peer">Custom Peer</string>
+    <string name="settings_custom_address">Wallet Address</string>
 
 </resources>

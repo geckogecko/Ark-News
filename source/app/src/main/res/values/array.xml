@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Networks">
+        <item>MainNet</item>
+        <item>TestNet</item>
+    </string-array>
+</resources>

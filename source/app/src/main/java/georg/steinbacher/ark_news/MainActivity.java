@@ -36,8 +36,15 @@ import georg.steinbacher.ark_news.requests.RequestQueueSingleton;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "MainActivity";
 
-    public static final String DEFAULT_PEER = "https://api.arkcoin.net/api/";
-    private static final String GET_TRANSACTIONS_URL = "transactions?recipientId=AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR&offset=";
+    public static final String DEFAULT_PEER = "https://explorer.ark.io:8443/api/";
+    public static final String DEFAULT_ADDRESS = "AZHXnQAYajd3XkxwwiL6jnLjtDHjtAATtR";
+
+    public static final String DEFAULT_TESTNET_PEER = "https://dexplorer.ark.io:8443/api/";
+    public static final String DEFAULT_TESTNET_ADDRESS = "DLRj8juWwPBapTeNakxQGbrJcWib7gFhkN";
+
+    private static final String GET_TRANSACTIONS_URL = "transactions?recipientId=";
+
+    private static final int SETTINGS_RESULT_CODE = 1;
 
     private Context mContext;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         //start pulling all transactions
         mSwipeRefreshLayout.setRefreshing(true);
-        this.onRefresh();
+        onRefresh();
 
     }
 
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent i = new Intent(this, PreferencesActivity.class);
-            startActivity(i);
+            startActivityForResult(i, SETTINGS_RESULT_CODE);
             return true;
         }
 
@@ -88,7 +95,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == SETTINGS_RESULT_CODE){
+            //start pulling all transactions
+            mSwipeRefreshLayout.setRefreshing(true);
+            onRefresh();
+        }
+    }
+
+    @Override
     public void onRefresh() {
+        mTransactionsList.clear();
+        mTransactionsCount = 0;
+        mCurrentOffset = 0;
         pullTransactions();
     }
 
@@ -101,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void pullTransactions() {
         JsonObjectRequest getTransactionsRequest = new JsonObjectRequest
-                (Request.Method.GET, getPeerURLFromPref() + GET_TRANSACTIONS_URL + mCurrentOffset, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, getPeerURLFromPref() + GET_TRANSACTIONS_URL + getAddressFromPref() + "&offset=" + mCurrentOffset, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -109,10 +130,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                             JSONArray transactions = response.getJSONArray("transactions");
                             addTransactions(transactions);
 
-                            mTransactionsCount = response.getInt("count");
+                            if(response.has("count")) {
+                                mTransactionsCount = response.getInt("count");
+                            } else {
+                                mTransactionsCount = -1;
+                            }
                             mCurrentOffset+=50;
 
-                            if(mTransactionsCount > mCurrentOffset) {
+                            if(mTransactionsCount > mCurrentOffset || (mTransactionsCount == -1 && transactions.length() >= 50)) {
                                 pullTransactions();
                             } else {
                                 //show the results
@@ -160,5 +185,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private String getPeerURLFromPref() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPref.getString(PreferencesActivity.PEER_ADDRESS_KEY, DEFAULT_PEER);
+    }
+
+    private String getAddressFromPref() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPref.getString(PreferencesActivity.WALLET_KEY, DEFAULT_ADDRESS);
     }
 }
